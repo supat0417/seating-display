@@ -31,7 +31,7 @@ function Screen({ lang, onLangChange }: { lang: Lang; onLangChange: (lang: Lang)
       <SparkleLayer />
       <LangToggle lang={lang} onChange={onLangChange} />
       <div id="wrap">
-        <Hero />
+        <Hero logo={seatingData.logo} />
         <SearchCard floorplan={seatingData.floorplan} guests={seatingData.guests} onFocusTable={focusTable} />
         <ChipsRow floorplan={seatingData.floorplan} onFocusTable={focusTable} />
         <PlanCard ref={planRef} floorplan={seatingData.floorplan} guests={seatingData.guests} />

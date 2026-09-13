@@ -11,6 +11,7 @@ export interface SeatingData {
   guests: Guest[];
   theme: ThemeInput;
   lang: Lang | null;
+  logo: string | null;
 }
 
 export class SeatingDataError extends Error {}
@@ -55,10 +56,11 @@ export function loadSeatingData(raw: unknown): SeatingData {
   });
   const theme: ThemeInput = !isBareArray && obj && resolveTheme(obj.theme as ThemeInput) ? (obj.theme as ThemeInput) : null;
   const lang: Lang | null = !isBareArray && obj && (obj.lang === 'th' || obj.lang === 'en') ? (obj.lang as Lang) : null;
+  const logo: string | null = !isBareArray && obj && typeof obj.logo === 'string' && /^data:image\//.test(obj.logo) ? obj.logo : null;
 
   if (floorplan.length === 0) {
     throw new SeatingDataError('Bundled seating data has no floorplan objects.');
   }
 
-  return { floorplan, guests, theme, lang };
+  return { floorplan, guests, theme, lang, logo };
 }

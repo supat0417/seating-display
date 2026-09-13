@@ -78,6 +78,16 @@ function themeAdjustLuminance(hex: string, target: number): string {
   if (lum < target) return themeLighten(hex, Math.max(0, Math.min(1, (target - lum) / (255 - lum))));
   return hex;
 }
+/** Like themeAdjustLuminance, but only pushes the color when it falls outside [min, max] —
+ * within the band, the source's own luminance passes through untouched. Used for the page
+ * backdrop so different team themes actually look different, instead of every theme being
+ * force-flattened to one exact luminance. */
+function themeClampLuminance(hex: string, min: number, max: number): string {
+  const lum = themeLuminance(hex);
+  if (lum < min) return themeAdjustLuminance(hex, min);
+  if (lum > max) return themeAdjustLuminance(hex, max);
+  return hex;
+}
 
 export const DISPLAY_THEME_VARS = [
   '--navy', '--navy-deep', '--navy-card', '--navy-card-rgb', '--navy-glow',
@@ -89,12 +99,20 @@ export type DisplayThemeTokens = Record<(typeof DISPLAY_THEME_VARS)[number], str
 /** Pure port of applyDisplayTheme's color math. The asymmetry between custom and preset
  * navy-source selection is deliberate (see original source comments): for custom themes the
  * page-wide dark backdrop reads as the 60% dominant swatch (s.light) darkened; presets keep
- * using their curated darkest swatch (s.deep) — do not "fix" this into symmetry. */
+ * using their curated darkest swatch (s.deep) — do not "fix" this into symmetry.
+ *
+ * The backdrop's luminance is clamped to [42, 95] rather than pinned to one exact value: a
+ * naturally dark navySource (e.g. amber's deep navy swatch) is barely touched, while a naturally
+ * light one (e.g. rose, which has no dark swatch at all) settles near the bright end of the band.
+ * This keeps every theme legible under the cream/gold text while still letting brightness vary
+ * by team, instead of every theme collapsing onto the same near-black backdrop. --navy-deep is
+ * derived as a fixed proportion of the resolved navy (not clamped independently) so the
+ * navy → navy-deep gradient keeps its depth at every point in the band. */
 export function computeDisplayThemeTokens(theme: ResolvedTheme): DisplayThemeTokens {
   const s = themeShades(theme);
   const navySource = theme.custom ? s.light : s.deep;
-  const navy = themeAdjustLuminance(navySource, 42);
-  const navyDeep = themeAdjustLuminance(navySource, 24);
+  const navy = themeClampLuminance(navySource, 42, 95);
+  const navyDeep = themeAdjustLuminance(navy, themeLuminance(navy) * (24 / 42));
   const navyCard = themeAdjustLuminance(s.deep, 62);
   const gold = themeAdjustLuminance(s.mid, 185);
   const goldBright = themeAdjustLuminance(s.mid, 215);
