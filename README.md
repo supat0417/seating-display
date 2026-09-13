@@ -10,7 +10,9 @@ React + TypeScript + Vite, organized as:
 
 ## Updating the displayed data
 
-Replace `src/data/seating-data.json` with a fresh export from the seating-plan app (its "Export" button produces exactly this shape) and redeploy.
+Place the exported `data.json` from seating-plan-app in `public/data.json`. The display loads this file when the page opens, so you can update the seating plan without rebuilding the app. If `public/data.json` is missing or invalid, it falls back to `src/data/seating-data.json`.
+
+The export includes the floor plan, guests, theme, language, and optional embedded logo. Deploy `public/data.json` alongside the built display app.
 
 ## Development
 

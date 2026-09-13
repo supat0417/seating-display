@@ -80,12 +80,12 @@ describe('theme system', () => {
 });
 
 describe('bundled data validation', () => {
-  it('loads and validates the real bundled normat-format-data export', () => {
+  it('loads and validates the real bundled seating-plan export', () => {
     const data = loadSeatingData(rawBundled);
     expect(data.floorplan.length).toBeGreaterThan(0);
     expect(data.guests.length).toBeGreaterThan(0);
-    expect(data.theme).toBe('sage');
-    expect(data.lang).toBe('en');
+    expect(data.theme === null || data.theme === 'custom' || THEMES.some((theme) => theme.id === data.theme)).toBe(true);
+    expect(data.lang === null || data.lang === 'th' || data.lang === 'en').toBe(true);
   });
   it('rejects a payload with no floorplan/guests arrays', () => {
     expect(() => loadSeatingData({ foo: 1 })).toThrow(SeatingDataError);

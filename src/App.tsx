@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { seatingData } from './data';
+import { fallbackSeatingData, loadDisplayData } from './data';
+import type { SeatingData } from './domain/dataFile';
 import { computeDisplayThemeTokens, resolveTheme, DISPLAY_THEME_VARS } from './domain/theme';
 import { loadLang, saveLang, type Lang } from './domain/i18n';
 import { I18nProvider, useT } from './ui/i18n/I18nContext';
@@ -12,7 +13,7 @@ import { ChipsRow } from './ui/features/chips/ChipsRow';
 import { PlanCard, type PlanCardHandle } from './ui/features/plan/PlanCard';
 import type { FloorplanObject } from './domain/floorplan';
 
-function Screen({ lang, onLangChange }: { lang: Lang; onLangChange: (lang: Lang) => void }) {
+function Screen({ data, lang, onLangChange }: { data: SeatingData; lang: Lang; onLangChange: (lang: Lang) => void }) {
   const { t } = useT();
   const planRef = useRef<PlanCardHandle | null>(null);
 
@@ -31,17 +32,22 @@ function Screen({ lang, onLangChange }: { lang: Lang; onLangChange: (lang: Lang)
       <SparkleLayer />
       <LangToggle lang={lang} onChange={onLangChange} />
       <div id="wrap">
-        <Hero logo={seatingData.logo} />
-        <SearchCard floorplan={seatingData.floorplan} guests={seatingData.guests} onFocusTable={focusTable} />
-        <ChipsRow floorplan={seatingData.floorplan} onFocusTable={focusTable} />
-        <PlanCard ref={planRef} floorplan={seatingData.floorplan} guests={seatingData.guests} />
+        <Hero logo={data.logo} />
+        <SearchCard floorplan={data.floorplan} guests={data.guests} onFocusTable={focusTable} />
+        <ChipsRow floorplan={data.floorplan} onFocusTable={focusTable} />
+        <PlanCard ref={planRef} floorplan={data.floorplan} guests={data.guests} />
       </div>
     </>
   );
 }
 
 export default function App() {
+  const [seatingData, setSeatingData] = useState<SeatingData>(fallbackSeatingData);
   const [{ lang, userSet }, setLangState] = useState(() => loadLang());
+
+  useEffect(() => {
+    loadDisplayData().then(setSeatingData);
+  }, [seatingData.theme]);
 
   // Apply the bundled data's theme once at boot (this app has no theme picker — it purely
   // renders whatever theme the exported data specifies).
@@ -68,7 +74,7 @@ export default function App() {
   return (
     <I18nProvider lang={effectiveLang}>
       <ToastProvider>
-        <Screen lang={effectiveLang} onLangChange={handleLangChange} />
+        <Screen data={seatingData} lang={effectiveLang} onLangChange={handleLangChange} />
       </ToastProvider>
     </I18nProvider>
   );
