@@ -17,6 +17,8 @@ const en: Dictionary = {
   homeTitle: 'Reset view',
   gpCloseLabel: 'Close',
   gpBackBtn: '◆ Back to overview',
+  gpShowAll: (n) => `See everyone at this table (${n}) ▴`,
+  gpShowLess: 'Show less ▾',
   tableWordPrefix: 'Table ',
   seatsSuffix: (n) => `${n} seat${n === 1 ? '' : 's'}`,
   seatInline: (seat) => `Seat ${seat}`,
