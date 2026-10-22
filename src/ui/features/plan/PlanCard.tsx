@@ -1,11 +1,19 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { computeContentBBox, seatPositions, type FloorplanObject } from '../../../domain/floorplan';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type CSSProperties } from 'react';
+import {
+  computeContentBBox, landmarkFor, normTable, objectBBox, seatCanvasPoint, seatIndexFor, seatPositions, unionRect,
+  type FloorplanObject,
+} from '../../../domain/floorplan';
 import type { Guest } from '../../../domain/guest';
 import { useT } from '../../i18n/I18nContext';
-import { useCamera } from '../../hooks/useCamera';
+import { useCamera, type Inset } from '../../hooks/useCamera';
 import { GuestPanel } from './GuestPanel';
 
 const ANIM_MS = 900;
+/** Seat dots sit just outside the table outline; include them in the framed area. */
+const SEAT_MARGIN = 14;
+const MOBILE_QUERY = '(max-width:720px)';
+/** Gap kept above the plan when it is scrolled to the top of the screen on mobile. */
+const MOBILE_TOP_GAP = 8;
 
 export interface PlanCardHandle {
   /** Focus a specific table object (by id), optionally highlighting a guest name in the
@@ -13,12 +21,18 @@ export interface PlanCardHandle {
   focusTable: (obj: FloorplanObject, highlightName: string | null) => void;
 }
 
+/** The searched-for guest's table and seat. Unlike the spotlight it survives panning, so the
+ * guest can look around the room and still see where they sit. */
+interface Pin { tableId: string; seatIndex: number | null; name: string | null; seat: string | null }
+
 export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[]; guests: Guest[] }>(
   function PlanCard({ floorplan, guests }, ref) {
     const { t } = useT();
     const contentBBox = useMemo(() => computeContentBBox(floorplan), [floorplan]);
 
     const [focusedId, setFocusedId] = useState<string | null>(null);
+    const [focusPt, setFocusPt] = useState({ x: 0, y: 0 });
+    const [pin, setPin] = useState<Pin | null>(null);
     const [spotlightOn, setSpotlightOn] = useState(false);
     const [ringKey, setRingKey] = useState(0);
     const [hintVisible, setHintVisible] = useState(true);
@@ -49,30 +63,62 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
 
     const camera = useCamera({ contentBBox, onTapTable, onInteractionStart });
 
+    /** How much of the viewport the guest panel will cover once open. On mobile the panel is
+     * a bottom sheet, so the plan is first scrolled to the top of the screen to keep most of
+     * it above the sheet. */
+    function panelInset(): Inset {
+      const vp = camera.viewportRef.current;
+      const panel = vp?.querySelector<HTMLElement>('.guest-panel');
+      if (!vp || !panel) return { right: 0, bottom: 0 };
+      if (!window.matchMedia(MOBILE_QUERY).matches) {
+        return { right: Math.min(panel.offsetWidth, vp.clientWidth * 0.6), bottom: 0 };
+      }
+      document.body.classList.add('plan-focused');
+      const vpTop = vp.getBoundingClientRect().top;
+      window.scrollTo({ top: window.scrollY + vpTop - MOBILE_TOP_GAP, behavior: 'smooth' });
+      const covered = MOBILE_TOP_GAP + vp.clientHeight - (window.innerHeight - panel.offsetHeight);
+      return { right: 0, bottom: Math.max(0, Math.min(covered, vp.clientHeight * 0.6)) };
+    }
+
     function focusTable(obj: FloorplanObject, name: string | null) {
-      const cx = obj.x + obj.w / 2;
-      const cy = obj.y + obj.h / 2;
-      camera.focusOn(cx, cy, obj.w, true);
+      const target = objectBBox(obj);
+      target.minX -= SEAT_MARGIN; target.minY -= SEAT_MARGIN;
+      target.maxX += SEAT_MARGIN; target.maxY += SEAT_MARGIN;
+      const landmark = landmarkFor(floorplan, obj);
+      const context = landmark ? unionRect(target, objectBBox(landmark)) : target;
+      setFocusPt(camera.focusFrame(target, context, panelInset(), true));
+
+      const guest = name
+        ? guests.find((g) => normTable(g.table) === normTable(obj.label) && g.name.trim().toLowerCase() === name.trim().toLowerCase())
+        : undefined;
+      setPin({
+        tableId: obj.id,
+        seatIndex: guest ? seatIndexFor(guest.seat, obj.capacity) : null,
+        name: guest?.name ?? null,
+        seat: guest?.seat ?? null,
+      });
+
       setFocusedId(obj.id);
       setHighlightName(name);
       setSpotlightOn(true);
       setRingKey((k) => k + 1);
       setHintVisible(false);
+      setPanelObj(obj);
       window.clearTimeout(focusTimerRef.current);
-      focusTimerRef.current = window.setTimeout(() => {
-        setPanelObj(obj);
-        setPanelOpen(true);
-      }, ANIM_MS - 120);
+      focusTimerRef.current = window.setTimeout(() => setPanelOpen(true), ANIM_MS - 120);
     }
 
     function resetView() {
+      window.clearTimeout(focusTimerRef.current);
       camera.resetToFit(true);
       clearFocusVisuals();
       closeGuestPanel();
+      setPin(null);
       setHintVisible(true);
+      document.body.classList.remove('plan-focused');
     }
 
-    useImperativeHandle(ref, () => ({ focusTable }), [floorplan]);
+    useImperativeHandle(ref, () => ({ focusTable }), [floorplan, guests]);
 
     // Initial fit + resize handling (re-fit if not focused; otherwise re-clamp current view).
     useEffect(() => {
@@ -88,6 +134,9 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const pinObj = pin ? floorplan.find((o) => o.id === pin.tableId) ?? null : null;
+    const pinPoint = pinObj && pin?.seatIndex != null ? seatCanvasPoint(pinObj, pin.seatIndex) : null;
+
     return (
       <div className="plan-card">
         <div className="plan-head">
@@ -99,27 +148,48 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
             <div className="leg-item"><span className="leg-dot door" /><span>{t('legDoor')}</span></div>
           </div>
         </div>
-        <div className="viewport" ref={camera.viewportRef}>
+        <div
+          className="viewport"
+          ref={camera.viewportRef}
+          style={{ '--fx': `${focusPt.x}px`, '--fy': `${focusPt.y}px` } as CSSProperties}
+        >
           <div className="floor-canvas" ref={camera.canvasRef}>
             {floorplan.map((o) => {
               const isTable = o.type === 'round' || o.type === 'long';
-              const dimmed = focusedId !== null && focusedId !== o.id;
+              // Only tables fade; the stage and doors stay crisp as orientation landmarks.
+              const dimmed = isTable && focusedId !== null && focusedId !== o.id;
               const focused = focusedId === o.id;
+              const pinned = pin?.tableId === o.id;
+              const showSeatNumbers = focused || pinned;
               return (
                 <div
                   key={o.id}
-                  className={`table-node ${o.type}${dimmed ? ' dimmed' : ''}${focused ? ' focused' : ''}`}
+                  className={`table-node ${o.type}${dimmed ? ' dimmed' : ''}${focused ? ' focused' : ''}${pinned ? ' pinned' : ''}`}
                   style={{ left: o.x, top: o.y, width: o.w, height: o.h, transform: `rotate(${o.rot || 0}deg)` }}
                   data-id={o.id}
                 >
                   {isTable && seatPositions(o.type, o.w, o.h, o.capacity).map((p, i) => (
-                    <div key={i} className="seat-mark" style={{ left: p.x, top: p.y }} />
+                    <div
+                      key={i}
+                      className={`seat-mark${showSeatNumbers ? ' numbered' : ''}${pinned && pin?.seatIndex === i ? ' me' : ''}`}
+                      style={{ left: p.x, top: p.y }}
+                    >
+                      {showSeatNumbers && <span style={{ transform: `rotate(${-(o.rot || 0)}deg)` }}>{i + 1}</span>}
+                    </div>
                   ))}
                   <div className="t-label">{o.label}</div>
                   {isTable && <div className="t-sub">{t('seatsSuffix', o.capacity || 0)}</div>}
                 </div>
               );
             })}
+            {pinPoint && pin && (
+              <div key={`${pin.tableId}-${pin.seatIndex}`} className="seat-pin" style={{ left: pinPoint.x, top: pinPoint.y }}>
+                <div className="seat-pin-label">
+                  <b>{pin.name}</b>
+                  <span>{t('seatInline', pin.seat ?? '')}</span>
+                </div>
+              </div>
+            )}
           </div>
           <div className={`spotlight${spotlightOn ? ' show' : ''}`} />
           <div key={ringKey} className={`focus-ring${ringKey > 0 ? ' play' : ''}`} />

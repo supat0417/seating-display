@@ -120,7 +120,7 @@ body{
 .leg-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);}
 .leg-dot{width:12px;height:12px;border-radius:50%;flex:none;background:var(--paper-soft);border:2px solid var(--slate);}
 .leg-dot.long{border-radius:4px;border-color:var(--gold-deep);background:rgba(var(--gold-rgb),0.18);}
-.leg-dot.stage{border-radius:3px;border-color:var(--navy);background:repeating-linear-gradient(45deg,#e8e2d4,#e8e2d4 3px,#d9d0ba 3px,#d9d0ba 6px);}
+.leg-dot.stage{border-radius:3px;border-color:#7a2e3a;background:repeating-linear-gradient(45deg,#ecd3d6,#ecd3d6 3px,#dfb9be 3px,#dfb9be 6px);}
 .leg-dot.door{border-radius:3px;border-color:var(--danger);border-style:dashed;background:rgba(193,84,60,0.1);}
 
 .viewport{
@@ -139,7 +139,7 @@ body{
 }
 .table-node.round{border-radius:50%;background:radial-gradient(circle at 33% 28%, #ffffff, #f6efdd 62%, #ebdfc0 100%);border:2px solid var(--gold-deep);box-shadow:0 3px 10px rgba(28,37,48,.14), inset 0 0 0 1px rgba(255,255,255,.6);}
 .table-node.long{border-radius:12px;background:linear-gradient(135deg,#ffffff,#f6efdd);border:2px solid var(--gold-deep);box-shadow:0 3px 10px rgba(28,37,48,.14);}
-.table-node.stage{border-radius:6px;background:repeating-linear-gradient(45deg, rgba(15,22,32,.88), rgba(15,22,32,.88) 8px, rgba(15,22,32,.72) 8px, rgba(15,22,32,.72) 16px);border:2px solid #0f1620;cursor:default;}
+.table-node.stage{border-radius:6px;background:repeating-linear-gradient(45deg, rgba(122,46,58,.92), rgba(122,46,58,.92) 8px, rgba(122,46,58,.78) 8px, rgba(122,46,58,.78) 16px);border:2px solid #5e2230;cursor:default;}
 .table-node.door{border-radius:4px;border:2px dashed var(--danger);background:rgba(193,84,60,.08);cursor:default;}
 .table-node .t-label{font-size:13px;font-weight:700;color:var(--navy);letter-spacing:0.02em;pointer-events:none;}
 .table-node.stage .t-label{color:var(--gold-bright);font-size:12px;}
@@ -147,7 +147,35 @@ body{
 .seat-mark{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--slate);opacity:.5;pointer-events:none;}
 .table-node.round .seat-mark,.table-node.long .seat-mark{background:var(--gold-deep);opacity:.4;}
 
-.table-node.dimmed{opacity:.13;filter:grayscale(.7);}
+.seat-mark.numbered{width:14px;height:14px;margin:-4px 0 0 -4px;opacity:1;background:var(--paper);
+  border:1.5px solid var(--gold-deep);display:flex;align-items:center;justify-content:center;transition:all .3s ease;}
+.table-node.round .seat-mark.numbered,.table-node.long .seat-mark.numbered{background:var(--paper);opacity:1;}
+.seat-mark.numbered span{font-size:8px;font-weight:700;line-height:1;color:var(--navy);font-family:var(--sans);}
+.table-node .seat-mark.numbered.me{background:var(--gold);border-color:var(--navy-deep);z-index:2;
+  box-shadow:0 0 0 3px rgba(var(--gold-rgb),.45);}
+.seat-mark.me span{color:var(--navy-deep);}
+
+/* Searched guest's own seat: a pin in canvas space (outside the rotated table) so its label
+   stays upright. */
+.seat-pin{position:absolute;width:0;height:0;z-index:30;pointer-events:none;}
+.seat-pin::before{content:"";position:absolute;left:-13px;top:-13px;width:26px;height:26px;border-radius:50%;
+  border:2px solid var(--gold);animation:seatPinPulse 1.6s ease-out infinite;}
+.seat-pin-label{
+  position:absolute;left:0;bottom:16px;transform:translateX(-50%);white-space:nowrap;
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+  background:var(--navy-deep);color:#fff;border-radius:9px;padding:5px 10px 6px;
+  font-family:var(--sans);font-size:11px;line-height:1.2;box-shadow:0 6px 16px rgba(15,22,32,.3);
+  animation:seatPinDrop .5s var(--ease-swoop) .7s backwards;
+}
+.seat-pin-label::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;
+  border:5px solid transparent;border-bottom:0;border-top-color:var(--navy-deep);}
+.seat-pin-label b{font-weight:700;max-width:180px;overflow:hidden;text-overflow:ellipsis;}
+.seat-pin-label span{color:var(--gold-bright);font-weight:700;font-size:10.5px;}
+@keyframes seatPinPulse{0%{transform:scale(.5);opacity:1;}100%{transform:scale(1.6);opacity:0;}}
+@keyframes seatPinDrop{0%{opacity:0;transform:translate(-50%,-10px);}100%{opacity:1;transform:translate(-50%,0);}}
+
+.table-node.dimmed{opacity:.42;filter:grayscale(.45);}
+.table-node.pinned:not(.focused){box-shadow:0 0 0 4px rgba(var(--gold-rgb),.45);}
 .table-node.focused{
   z-index:25;box-shadow:0 0 0 6px rgba(var(--gold-rgb),.4), 0 0 46px rgba(var(--gold-rgb),.6);
   animation:focusPulse 1.7s ease-in-out infinite;
@@ -158,11 +186,11 @@ body{
 }
 
 .spotlight{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .6s ease;z-index:15;
-  background:radial-gradient(circle at 50% 50%, transparent 0, transparent 140px, rgba(15,22,32,.5) 340px);}
+  background:radial-gradient(circle at var(--fx,50%) var(--fy,50%), transparent 0, transparent 120px, rgba(15,22,32,.22) 420px);}
 .spotlight.show{opacity:1;}
-.focus-ring{position:absolute;top:50%;left:50%;width:36px;height:36px;margin:-18px 0 0 -18px;
+.focus-ring{position:absolute;top:var(--fy,50%);left:var(--fx,50%);width:36px;height:36px;margin:-18px 0 0 -18px;
   border:2px solid var(--gold);border-radius:50%;opacity:0;pointer-events:none;z-index:16;}
-.focus-ring.play{animation:ringPulse 1s var(--ease-swoop);}
+.focus-ring.play{animation:ringPulse 1s var(--ease-swoop) .6s;}
 @keyframes ringPulse{
   0%{opacity:.95;width:36px;height:36px;margin:-18px 0 0 -18px;}
   100%{opacity:0;width:280px;height:280px;margin:-140px 0 0 -140px;}
@@ -230,9 +258,12 @@ body{
 .gp-back:hover{background:rgba(var(--gold-rgb),.32);}
 
 @media (max-width:720px){
-  .guest-panel{position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;max-width:none;height:auto;max-height:82vh;
+  /* Fixed-height sheet so the plan can be framed above it before it opens. */
+  .guest-panel{position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;max-width:none;height:min(44vh,400px);
     transform:translateY(102%);border-left:none;border-top:1px solid #e4dcc8;border-radius:20px 20px 0 0;}
   .guest-panel.open{transform:translateY(0);}
+  /* Room to scroll the plan up to the top of the screen while the sheet is showing. */
+  body.plan-focused #wrap{padding-bottom:min(44vh,400px);}
   .zoom-controls{right:14px;bottom:14px;}
   .plan-head{justify-content:center;text-align:center;}
 }
