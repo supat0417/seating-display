@@ -62,27 +62,64 @@ export function formatTableLabel(table: string, tableWordPrefix: string): string
   return `${tableWordPrefix}${s}`;
 }
 
+export interface Rect { minX: number; minY: number; maxX: number; maxY: number }
+
+/** Rotation-aware bounding box of a single object in canvas coordinates. */
+export function objectBBox(o: FloorplanObject): Rect {
+  const cx = o.x + o.w / 2, cy = o.y + o.h / 2;
+  const rad = ((o.rot || 0) * Math.PI) / 180;
+  const cos = Math.cos(rad), sin = Math.sin(rad);
+  const hw = o.w / 2, hh = o.h / 2;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  ([[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]] as const).forEach(([dx, dy]) => {
+    const rx = cx + dx * cos - dy * sin;
+    const ry = cy + dx * sin + dy * cos;
+    if (rx < minX) minX = rx;
+    if (rx > maxX) maxX = rx;
+    if (ry < minY) minY = ry;
+    if (ry > maxY) maxY = ry;
+  });
+  return { minX, minY, maxX, maxY };
+}
+
+export function unionRect(a: Rect, b: Rect): Rect {
+  return { minX: Math.min(a.minX, b.minX), minY: Math.min(a.minY, b.minY), maxX: Math.max(a.maxX, b.maxX), maxY: Math.max(a.maxY, b.maxY) };
+}
+
+/** The reference point a guest orients by when looking at a focused table: the nearest
+ * stage, or the nearest door if the plan has no stage. */
+export function landmarkFor(floorplan: FloorplanObject[], obj: FloorplanObject): FloorplanObject | null {
+  const dist = (o: FloorplanObject) => Math.hypot(o.x + o.w / 2 - (obj.x + obj.w / 2), o.y + o.h / 2 - (obj.y + obj.h / 2));
+  const nearest = (type: ObjectType) =>
+    floorplan.filter((o) => o.type === type && o.id !== obj.id).sort((a, b) => dist(a) - dist(b))[0] ?? null;
+  return nearest('stage') ?? nearest('door');
+}
+
+/** Index into seatPositions() for a guest's seat value ("3" -> 2), or null when the seat
+ * isn't a whole number within the table's capacity. */
+export function seatIndexFor(seat: string | null | undefined, capacity: number): number | null {
+  const n = Number(String(seat ?? '').trim());
+  if (!Number.isInteger(n) || n < 1 || n > capacity) return null;
+  return n - 1;
+}
+
+/** Canvas-space centre of seat `index` on a table, following the table's rotation. */
+export function seatCanvasPoint(o: FloorplanObject, index: number): { x: number; y: number } | null {
+  const p = seatPositions(o.type, o.w, o.h, o.capacity)[index];
+  if (!p) return null;
+  const dx = p.x + 3 - o.w / 2, dy = p.y + 3 - o.h / 2;
+  const rad = ((o.rot || 0) * Math.PI) / 180;
+  const cos = Math.cos(rad), sin = Math.sin(rad);
+  return { x: o.x + o.w / 2 + dx * cos - dy * sin, y: o.y + o.h / 2 + dx * sin + dy * cos };
+}
+
 /** Rotation-aware tight bounding box around actual table geometry (not the whole 1400x900
  * canvas), padded, with a minimum span so a tiny/lone layout doesn't get zoomed absurdly. */
-export function computeContentBBox(floorplan: FloorplanObject[]): { minX: number; minY: number; maxX: number; maxY: number } {
+export function computeContentBBox(floorplan: FloorplanObject[]): Rect {
   const PAD = 40;
   const MIN_SPAN = 260;
   if (!floorplan.length) return { minX: 0, minY: 0, maxX: CANVAS_W, maxY: CANVAS_H };
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  floorplan.forEach((o) => {
-    const cx = o.x + o.w / 2, cy = o.y + o.h / 2;
-    const rad = ((o.rot || 0) * Math.PI) / 180;
-    const cos = Math.cos(rad), sin = Math.sin(rad);
-    const hw = o.w / 2, hh = o.h / 2;
-    ([[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]] as const).forEach(([dx, dy]) => {
-      const rx = cx + dx * cos - dy * sin;
-      const ry = cy + dx * sin + dy * cos;
-      if (rx < minX) minX = rx;
-      if (rx > maxX) maxX = rx;
-      if (ry < minY) minY = ry;
-      if (ry > maxY) maxY = ry;
-    });
-  });
+  let { minX, minY, maxX, maxY } = floorplan.map(objectBBox).reduce(unionRect);
   minX -= PAD; minY -= PAD; maxX += PAD; maxY += PAD;
   if (maxX - minX < MIN_SPAN) {
     const c = (minX + maxX) / 2;
