@@ -12,8 +12,14 @@ const ANIM_MS = 900;
 /** Seat dots sit just outside the table outline; include them in the framed area. */
 const SEAT_MARGIN = 14;
 const MOBILE_QUERY = '(max-width:720px)';
-/** Gap kept above the plan when it is scrolled to the top of the screen on mobile. */
+/** Gap kept between the sticky search card and the plan when it is scrolled into view on mobile. */
 const MOBILE_TOP_GAP = 8;
+/** Upper bound of the mobile sheet's collapsed "peek" height (see .guest-panel in index.css). */
+const MOBILE_PEEK_PX = 190;
+
+function isMobile() {
+  return window.matchMedia(MOBILE_QUERY).matches;
+}
 
 export interface PlanCardHandle {
   /** Focus a specific table object (by id), optionally highlighting a guest name in the
@@ -37,6 +43,7 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
     const [ringKey, setRingKey] = useState(0);
     const [hintVisible, setHintVisible] = useState(true);
     const [panelOpen, setPanelOpen] = useState(false);
+    const [panelExpanded, setPanelExpanded] = useState(false);
     const [panelObj, setPanelObj] = useState<FloorplanObject | null>(null);
     const [highlightName, setHighlightName] = useState<string | null>(null);
     const focusTimerRef = useRef<number | undefined>(undefined);
@@ -51,7 +58,8 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
     const onInteractionStart = useCallback(() => {
       if (focusedId) {
         clearFocusVisuals();
-        closeGuestPanel();
+        // The mobile peek sheet is small enough to keep while the guest looks around.
+        if (!isMobile()) closeGuestPanel();
       }
     }, [focusedId, clearFocusVisuals, closeGuestPanel]);
 
@@ -64,20 +72,30 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
     const camera = useCamera({ contentBBox, onTapTable, onInteractionStart });
 
     /** How much of the viewport the guest panel will cover once open. On mobile the panel is
-     * a bottom sheet, so the plan is first scrolled to the top of the screen to keep most of
-     * it above the sheet. */
+     * a bottom sheet that opens as a short peek, and the plan is scrolled to the top of the
+     * screen so it sits entirely above it. */
     function panelInset(): Inset {
       const vp = camera.viewportRef.current;
       const panel = vp?.querySelector<HTMLElement>('.guest-panel');
       if (!vp || !panel) return { right: 0, bottom: 0 };
-      if (!window.matchMedia(MOBILE_QUERY).matches) {
+      if (!isMobile()) {
         return { right: Math.min(panel.offsetWidth, vp.clientWidth * 0.6), bottom: 0 };
       }
       document.body.classList.add('plan-focused');
-      const vpTop = vp.getBoundingClientRect().top;
-      window.scrollTo({ top: window.scrollY + vpTop - MOBILE_TOP_GAP, behavior: 'smooth' });
-      const covered = MOBILE_TOP_GAP + vp.clientHeight - (window.innerHeight - panel.offsetHeight);
-      return { right: 0, bottom: Math.max(0, Math.min(covered, vp.clientHeight * 0.6)) };
+      // The search card is sticky, so the plan has to land below it rather than at the very top.
+      const search = document.querySelector<HTMLElement>('.search-card');
+      const stickyTop = search ? parseFloat(getComputedStyle(search).top) || 0 : 0;
+      const topGap = (search ? stickyTop + search.offsetHeight : 0) + MOBILE_TOP_GAP;
+      const scrollToPlan = () => {
+        const top = window.scrollY + vp.getBoundingClientRect().top - topGap;
+        window.scrollTo({ top, behavior: 'smooth' });
+      };
+      scrollToPlan();
+      // A late layout change (keyboard finishing closing, URL bar resizing) can cut the smooth
+      // scroll short; re-aim once the dust settles.
+      window.setTimeout(scrollToPlan, 450);
+      const covered = topGap + vp.clientHeight - (window.innerHeight - MOBILE_PEEK_PX);
+      return { right: 0, bottom: Math.max(0, Math.min(covered, vp.clientHeight * 0.5)) };
     }
 
     function focusTable(obj: FloorplanObject, name: string | null) {
@@ -104,6 +122,7 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
       setRingKey((k) => k + 1);
       setHintVisible(false);
       setPanelObj(obj);
+      setPanelExpanded(false);
       window.clearTimeout(focusTimerRef.current);
       focusTimerRef.current = window.setTimeout(() => setPanelOpen(true), ANIM_MS - 120);
     }
@@ -199,7 +218,8 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
             <button className="zbtn home" title={t('homeTitle')} onClick={resetView}>⤢</button>
             <button className="zbtn" title={t('zoomOutTitle')} onClick={() => { onInteractionStart(); camera.zoomOutBtn(); }}>−</button>
           </div>
-          <GuestPanel obj={panelObj} guests={guests} highlightName={highlightName} open={panelOpen} onClose={resetView} />
+          <GuestPanel obj={panelObj} guests={guests} highlightName={highlightName} open={panelOpen}
+            expanded={panelExpanded} onToggleExpanded={() => setPanelExpanded((v) => !v)} onClose={resetView} />
         </div>
       </div>
     );

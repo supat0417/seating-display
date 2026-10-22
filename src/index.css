@@ -256,14 +256,38 @@ body{
   padding:11px;cursor:pointer;transition:background .15s;
 }
 .gp-back:hover{background:rgba(var(--gold-rgb),.32);}
+/* Peek-only controls (mobile bottom sheet). */
+.gp-peek-me,.gp-toggle{display:none;}
 
 @media (max-width:720px){
-  /* Fixed-height sheet so the plan can be framed above it before it opens. */
-  .guest-panel{position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;max-width:none;height:min(44vh,400px);
-    transform:translateY(102%);border-left:none;border-top:1px solid #e4dcc8;border-radius:20px 20px 0 0;}
+  /* Bottom sheet opens as a short peek (head + your seat + "see everyone") so the plan stays
+     visible above it; .expanded shows the full roster. Keep MOBILE_PEEK_PX in PlanCard in sync. */
+  .guest-panel{position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;max-width:none;height:auto;
+    transform:translateY(102%);border-left:none;border-top:1px solid #e4dcc8;border-radius:18px 18px 0 0;
+    padding-bottom:env(safe-area-inset-bottom);}
   .guest-panel.open{transform:translateY(0);}
+  .guest-panel.expanded{height:min(72vh,620px);}
+  .guest-panel:not(.expanded) .gp-body,.guest-panel:not(.expanded) .gp-foot{display:none;}
+  /* No click-away layer: the guest must be able to pan the plan while the sheet is up. */
+  .panel-backdrop.show{display:none;}
+
+  .gp-head{display:flex;align-items:center;gap:10px;padding:12px 52px 12px 16px;border-radius:18px 18px 0 0;}
+  .gp-eyebrow{display:none;}
+  .gp-title{font-size:19px;margin:0;line-height:1.2;}
+  .gp-cap{padding:3px 9px;font-size:11.5px;}
+  .gp-close{top:50%;transform:translateY(-50%);}
+  .gp-peek-me{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 14px 0;
+    padding:10px 13px;border-radius:10px;border:1px solid var(--gold);background:#fffaf0;
+    box-shadow:0 0 0 3px rgba(var(--gold-rgb),.22);font-size:14px;}
+  .gp-peek-me .gname{font-weight:800;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .gp-peek-me .gseat{font-family:var(--serif);font-weight:800;color:var(--gold-deep);white-space:nowrap;}
+  .gp-toggle{display:block;width:calc(100% - 28px);margin:8px 14px 10px;padding:9px;border-radius:10px;
+    border:1px solid rgba(var(--gold-rgb),.5);background:var(--gold-soft);color:var(--navy);
+    font-family:var(--sans);font-weight:700;font-size:13px;cursor:pointer;}
+  .gp-body{padding-top:4px;}
+
   /* Room to scroll the plan up to the top of the screen while the sheet is showing. */
-  body.plan-focused #wrap{padding-bottom:min(44vh,400px);}
+  body.plan-focused #wrap{padding-bottom:45vh;}
   .zoom-controls{right:14px;bottom:14px;}
   .plan-head{justify-content:center;text-align:center;}
 }

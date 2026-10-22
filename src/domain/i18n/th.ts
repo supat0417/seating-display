@@ -17,6 +17,8 @@ const th: Dictionary = {
   homeTitle: 'ภาพรวมทั้งหมด',
   gpCloseLabel: 'ปิด',
   gpBackBtn: '◆ กลับสู่ภาพรวมทั้งหมด',
+  gpShowAll: (n) => `ดูรายชื่อทั้งโต๊ะ (${n}) ▴`,
+  gpShowLess: 'ย่อรายชื่อ ▾',
   tableWordPrefix: 'โต๊ะ ',
   seatsSuffix: (n) => `${n} ที่นั่ง`,
   seatInline: (seat) => `ที่นั่ง ${seat}`,
