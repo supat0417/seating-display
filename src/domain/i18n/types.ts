@@ -17,6 +17,8 @@ export interface Dictionary {
   homeTitle: string;
   gpCloseLabel: string;
   gpBackBtn: string;
+  gpShowAll: (n: number) => string;
+  gpShowLess: string;
   tableWordPrefix: string;
   seatsSuffix: (n: number) => string;
   seatInline: (seat: string) => string;
