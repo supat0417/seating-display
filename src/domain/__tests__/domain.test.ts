@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CANVAS_H, CANVAS_W, computeContentBBox, formatTableLabel, seatPositions } from '../floorplan';
+import { CANVAS_H, CANVAS_W, computeContentBBox, formatTableLabel, landmarkFor, seatCanvasPoint, seatIndexFor, seatPositions, type FloorplanObject } from '../floorplan';
 import { seatRosterForTable } from '../guest';
 import { THEMES, computeDisplayThemeTokens, resolveTheme } from '../theme';
 import { loadSeatingData, SeatingDataError } from '../dataFile';
@@ -103,5 +103,38 @@ describe('bundled data validation', () => {
 describe('i18n dictionary parity', () => {
   it('th and en have identical key sets', () => {
     expect(Object.keys(DICTIONARIES.th).sort()).toEqual(Object.keys(DICTIONARIES.en).sort());
+  });
+});
+
+describe('focus helpers', () => {
+  const obj = (id: string, type: FloorplanObject['type'], x: number, y: number, rot = 0): FloorplanObject =>
+    ({ id, type, x, y, w: 100, h: 100, rot, label: id, capacity: type === 'round' ? 8 : 0 });
+
+  it('prefers the stage as landmark, falling back to the nearest door', () => {
+    const table = obj('t1', 'round', 500, 500);
+    const stage = obj('s', 'stage', 0, 0);
+    const nearDoor = obj('d1', 'door', 600, 600);
+    const farDoor = obj('d2', 'door', 1200, 0);
+    expect(landmarkFor([table, stage, nearDoor, farDoor], table)?.id).toBe('s');
+    expect(landmarkFor([table, farDoor, nearDoor], table)?.id).toBe('d1');
+    expect(landmarkFor([table], table)).toBeNull();
+  });
+
+  it('maps numeric seats to seatPositions indexes', () => {
+    expect(seatIndexFor('3', 8)).toBe(2);
+    expect(seatIndexFor(' 1 ', 8)).toBe(0);
+    expect(seatIndexFor('9', 8)).toBeNull();
+    expect(seatIndexFor('A', 8)).toBeNull();
+    expect(seatIndexFor('', 8)).toBeNull();
+  });
+
+  it('places seat 1 above a round table and follows rotation', () => {
+    const r = 100 / 2 + 9;
+    const top = seatCanvasPoint(obj('t', 'round', 0, 0), 0)!;
+    expect(top.x).toBeCloseTo(50, 5);
+    expect(top.y).toBeCloseTo(50 - r, 5);
+    const turned = seatCanvasPoint(obj('t', 'round', 0, 0, 90), 0)!;
+    expect(turned.x).toBeCloseTo(50 + r, 5);
+    expect(turned.y).toBeCloseTo(50, 5);
   });
 });
