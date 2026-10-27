@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "exportedAt": "2026-10-22T09:33:18.802Z",
+  "exportedAt": "2026-10-27T02:06:35.602Z",
   "theme": {
     "id": "custom",
     "colors": [
@@ -470,6 +470,11 @@
       "seat": "1"
     },
     {
+      "name": "Aunty Suang",
+      "table": "Table 4",
+      "seat": "2"
+    },
+    {
       "name": "Aunty Nong",
       "table": "Table 4",
       "seat": "3"
@@ -775,114 +780,114 @@
       "seat": "16"
     },
     {
-      "name": "หมอพรหมเมศ",
+      "name": "คุณอนุทัย",
       "table": "Table 6",
       "seat": "17"
     },
     {
-      "name": "คุณอนุทัย",
+      "name": "คุณอุกฤษฏ์",
       "table": "Table 6",
       "seat": "18"
     },
     {
-      "name": "คุณอุกฤษฏ์",
+      "name": "คุณนันทิกา",
       "table": "Table 6",
       "seat": "19"
     },
     {
-      "name": "คุณนันทิกา",
+      "name": "คุณประเสริฐ",
       "table": "Table 6",
       "seat": "20"
     },
     {
-      "name": "คุณประเสริฐ",
+      "name": "คุณไก่",
       "table": "Table 6",
       "seat": "21"
     },
     {
-      "name": "คุณไก่",
-      "table": "Table 6",
-      "seat": "23"
-    },
-    {
       "name": "คุณนิตินัย",
       "table": "Table 6",
-      "seat": "24"
+      "seat": "22"
     },
     {
       "name": "คุณอลิปรียา",
       "table": "Table 6",
+      "seat": "23"
+    },
+    {
+      "name": "คุณถกลวรรณ",
+      "table": "Table 6",
+      "seat": "24"
+    },
+    {
+      "name": "คุณถกลวรรณ",
+      "table": "Table 6",
       "seat": "25"
-    },
-    {
-      "name": "คุณถกลวรรณ",
-      "table": "Table 6",
-      "seat": "26"
-    },
-    {
-      "name": "คุณถกลวรรณ",
-      "table": "Table 6",
-      "seat": "27"
     },
     {
       "name": "คุณตุ้ย",
       "table": "Table 6",
-      "seat": "28"
+      "seat": "26"
     },
     {
       "name": "คุณนริดา",
       "table": "Table 6",
-      "seat": "29"
+      "seat": "27"
     },
     {
       "name": "คุณละเอียด",
       "table": "Table 6",
-      "seat": "30"
+      "seat": "28"
     },
     {
       "name": "คุณเกื้อกูล",
       "table": "Table 6",
-      "seat": "31"
+      "seat": "29"
     },
     {
       "name": "คุณคมกริช",
       "table": "Table 6",
-      "seat": "32"
+      "seat": "30"
     },
     {
       "name": "คุณบิ๊ก",
       "table": "Table 6",
-      "seat": "33"
+      "seat": "31"
     },
     {
       "name": "คุณธัญทิพย์",
       "table": "Table 6",
-      "seat": "34"
+      "seat": "32"
     },
     {
       "name": "คุณกฤษดา",
       "table": "Table 6",
-      "seat": "35"
+      "seat": "33"
     },
     {
       "name": "คุณณัฒฐาภรณ์",
       "table": "Table 6",
-      "seat": "36"
+      "seat": "34"
     },
     {
       "name": "คุณนริสร์",
       "table": "Table 6",
+      "seat": "35"
+    },
+    {
+      "name": "คุณสรานุวัตร",
+      "table": "Table 6",
+      "seat": "36"
+    },
+    {
+      "name": "คุณสรานุวัตร",
+      "table": "Table 6",
       "seat": "37"
     },
     {
-      "name": "คุณสรานุวัตร",
+      "name": "หมอพรหมเมศ",
       "table": "Table 6",
       "seat": "38"
-    },
-    {
-      "name": "คุณสรานุวัตร",
-      "table": "Table 6",
-      "seat": "39"
     },
     {
       "name": "Pat",
@@ -1185,17 +1190,17 @@
       "seat": "13"
     },
     {
-      "name": "Ploy",
+      "name": "Nam",
       "table": "Table 9",
       "seat": "14"
     },
     {
-      "name": "Gook",
+      "name": "Ploy",
       "table": "Table 9",
       "seat": "15"
     },
     {
-      "name": "Vekin",
+      "name": "Grace",
       "table": "Table 9",
       "seat": "16"
     },
@@ -1270,9 +1275,14 @@
       "seat": "30"
     },
     {
-      "name": "Grace",
+      "name": "Gook",
       "table": "Table 9",
       "seat": "31"
+    },
+    {
+      "name": "Vekin",
+      "table": "Table 9",
+      "seat": "32"
     },
     {
       "name": "Art",
@@ -1597,22 +1607,22 @@
     {
       "name": "Kim",
       "table": "Table 11",
-      "seat": "33"
+      "seat": "32"
     },
     {
       "name": "Ham",
       "table": "Table 11",
-      "seat": "34"
+      "seat": "33"
     },
     {
       "name": "Best",
       "table": "Table 11",
-      "seat": "35"
+      "seat": "34"
     },
     {
       "name": "Ink",
       "table": "Table 11",
-      "seat": "36"
+      "seat": "35"
     },
     {
       "name": "Ukrit",
