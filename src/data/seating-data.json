@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "exportedAt": "2026-10-27T02:06:35.602Z",
+  "exportedAt": "2026-10-29T04:05:57.669Z",
   "theme": {
     "id": "custom",
     "colors": [
@@ -595,109 +595,114 @@
       "seat": "2"
     },
     {
-      "name": "Aunty Mee",
+      "name": "คุณเสาวลักษณ์",
       "table": "Table 5",
       "seat": "3"
     },
     {
-      "name": "Uncle Oh",
+      "name": "Aunty Mee",
       "table": "Table 5",
       "seat": "4"
     },
     {
-      "name": "Aunty Vee",
+      "name": "Uncle Oh",
       "table": "Table 5",
       "seat": "5"
     },
     {
-      "name": "Mingsarn (J Daeng)",
+      "name": "Aunty Vee",
       "table": "Table 5",
       "seat": "6"
     },
     {
-      "name": "Orapim Kaosa-ard",
+      "name": "Mingsarn (J Daeng)",
       "table": "Table 5",
       "seat": "7"
     },
     {
-      "name": "Chamaiparn (J Oi)",
+      "name": "Orapim Kaosa-ard",
       "table": "Table 5",
       "seat": "8"
     },
     {
-      "name": "Siriwan Santijiarakul",
+      "name": "Chamaiparn (J Oi)",
       "table": "Table 5",
       "seat": "9"
     },
     {
-      "name": "Kitipoch",
+      "name": "Siriwan Santijiarakul",
       "table": "Table 5",
       "seat": "10"
     },
     {
-      "name": "Suluck",
+      "name": "Kitipoch",
       "table": "Table 5",
       "seat": "11"
     },
     {
-      "name": "Korn",
+      "name": "Suluck",
       "table": "Table 5",
       "seat": "12"
     },
     {
-      "name": "Poon",
+      "name": "Korn",
       "table": "Table 5",
       "seat": "13"
     },
     {
-      "name": "Shane",
+      "name": "Poon",
       "table": "Table 5",
       "seat": "14"
     },
     {
-      "name": "Joe",
+      "name": "Shane",
       "table": "Table 5",
       "seat": "15"
     },
     {
-      "name": "Aunty Janice",
+      "name": "Joe",
       "table": "Table 5",
       "seat": "16"
     },
     {
-      "name": "Uncle Steve",
+      "name": "Aunty Janice",
       "table": "Table 5",
       "seat": "17"
     },
     {
-      "name": "Wasamon Santikarn",
+      "name": "Uncle Steve",
       "table": "Table 5",
       "seat": "18"
     },
     {
-      "name": "Piyachai Eaimsukawat",
+      "name": "Wasamon Santikarn",
       "table": "Table 5",
       "seat": "19"
     },
     {
-      "name": "Peevara Kitchumnongpan",
+      "name": "Piyachai Eaimsukawat",
       "table": "Table 5",
       "seat": "20"
     },
     {
-      "name": "ปุ๋ย",
+      "name": "Peevara Kitchumnongpan",
       "table": "Table 5",
       "seat": "21"
     },
     {
-      "name": "Somsri",
+      "name": "ปุ๋ย",
       "table": "Table 5",
       "seat": "22"
     },
     {
-      "name": "ทะเล",
+      "name": "Somsri",
       "table": "Table 5",
       "seat": "23"
+    },
+    {
+      "name": "ทะเล",
+      "table": "Table 5",
+      "seat": "24"
     },
     {
       "name": "คุณกันทริศร์",
