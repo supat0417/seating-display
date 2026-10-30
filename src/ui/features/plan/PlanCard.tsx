@@ -187,7 +187,7 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
                   style={{ left: o.x, top: o.y, width: o.w, height: o.h, transform: `rotate(${o.rot || 0}deg)` }}
                   data-id={o.id}
                 >
-                  {isTable && seatPositions(o.type, o.w, o.h, o.capacity).map((p, i) => (
+                  {isTable && seatPositions(o.type, o.w, o.h, o.capacity, o.mirror).map((p, i) => (
                     <div
                       key={i}
                       className={`seat-mark${showSeatNumbers ? ' numbered' : ''}${pinned && pin?.seatIndex === i ? ' me' : ''}`}
