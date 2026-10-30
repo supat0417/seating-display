@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "exportedAt": "2026-10-29T04:05:57.669Z",
+  "exportedAt": "2026-10-30T03:51:17.659Z",
   "theme": {
     "id": "custom",
     "colors": [
@@ -42,9 +42,10 @@
       "y": 310.413,
       "w": 200,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 1",
-      "capacity": 16
+      "capacity": 16,
+      "mirror": true
     },
     {
       "id": "t22",
@@ -53,9 +54,10 @@
       "y": 285.135,
       "w": 250,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 2",
-      "capacity": 22
+      "capacity": 22,
+      "mirror": true
     },
     {
       "id": "t23",
@@ -64,9 +66,10 @@
       "y": 240.691,
       "w": 250,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 3",
-      "capacity": 22
+      "capacity": 22,
+      "mirror": true
     },
     {
       "id": "t25",
@@ -75,9 +78,10 @@
       "y": 285.135,
       "w": 250,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 5",
-      "capacity": 24
+      "capacity": 24,
+      "mirror": true
     },
     {
       "id": "t27",
@@ -86,9 +90,10 @@
       "y": 240.691,
       "w": 250,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 4",
-      "capacity": 24
+      "capacity": 24,
+      "mirror": true
     },
     {
       "id": "t28",
@@ -97,9 +102,10 @@
       "y": 285.135,
       "w": 250,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 6",
-      "capacity": 40
+      "capacity": 38,
+      "mirror": true
     },
     {
       "id": "t29",
@@ -108,9 +114,10 @@
       "y": 673.233,
       "w": 250,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 7",
-      "capacity": 26
+      "capacity": 26,
+      "mirror": true
     },
     {
       "id": "t30",
@@ -119,9 +126,10 @@
       "y": 647.259,
       "w": 300,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 8",
-      "capacity": 22
+      "capacity": 22,
+      "mirror": true
     },
     {
       "id": "t31",
@@ -130,9 +138,10 @@
       "y": 673.233,
       "w": 250,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 9",
-      "capacity": 32
+      "capacity": 32,
+      "mirror": true
     },
     {
       "id": "t32",
@@ -141,9 +150,10 @@
       "y": 673.233,
       "w": 250,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 10",
-      "capacity": 34
+      "capacity": 34,
+      "mirror": true
     },
     {
       "id": "t33",
@@ -152,9 +162,10 @@
       "y": 647.259,
       "w": 300,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 11",
-      "capacity": 36
+      "capacity": 36,
+      "mirror": true
     },
     {
       "id": "t34",
@@ -163,9 +174,10 @@
       "y": 673.233,
       "w": 250,
       "h": 50,
-      "rot": 90,
+      "rot": 270,
       "label": "Table 12",
-      "capacity": 28
+      "capacity": 28,
+      "mirror": true
     }
   ],
   "guests": [
