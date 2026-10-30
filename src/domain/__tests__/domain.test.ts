@@ -25,6 +25,14 @@ describe('seatPositions (display app variant)', () => {
     expect(pts[0].y).toBeCloseTo(-9, 5);
     expect(pts[2].y).toBeCloseTo(72, 5);
   });
+  it('mirror starts seat 1 on the right, and the pin follows it', () => {
+    const plain = seatPositions('long', 220, 70, 4);
+    const mirrored = seatPositions('long', 220, 70, 4, true);
+    expect(mirrored[0].x).toBeCloseTo(plain[1].x, 5);
+    expect(mirrored[2].x).toBeCloseTo(plain[3].x, 5);
+    const o: FloorplanObject = { id: 't', type: 'long', x: 0, y: 0, w: 220, h: 70, rot: 0, label: 'L', capacity: 4 };
+    expect(seatCanvasPoint({ ...o, mirror: true }, 0)!.x).toBeCloseTo(seatCanvasPoint(o, 1)!.x, 5);
+  });
 });
 
 describe('formatTableLabel', () => {
