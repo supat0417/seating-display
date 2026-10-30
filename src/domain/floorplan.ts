@@ -13,6 +13,8 @@ export interface FloorplanObject {
   w: number;
   h: number;
   rot: number;
+  /** Flip seat numbering left-right, so seat 1 starts on the right instead of the left. */
+  mirror?: boolean;
   label: string;
   capacity: number;
 }
@@ -31,8 +33,9 @@ export function clamp(v: number, min: number, max: number): number {
 }
 
 /** seatPositions(type,w,h,capacity) ported verbatim from seating-display.html:
- * round -> radius min(w,h)/2+9, start angle -90deg; long -> two rows, x-spacing (w-14)/+7. */
-export function seatPositions(type: ObjectType, w: number, h: number, capacity: number): Array<{ x: number; y: number }> {
+ * round -> radius min(w,h)/2+9, start angle -90deg; long -> two rows, x-spacing (w-14)/+7.
+ * `mirror` flips every dot left-right across the object's own vertical centre line. */
+export function seatPositions(type: ObjectType, w: number, h: number, capacity: number, mirror = false): Array<{ x: number; y: number }> {
   const pts: Array<{ x: number; y: number }> = [];
   if (capacity <= 0) return pts;
   if (type === 'round') {
@@ -52,7 +55,7 @@ export function seatPositions(type: ObjectType, w: number, h: number, capacity: 
       pts.push({ x: x - 3, y });
     }
   }
-  return pts;
+  return mirror ? pts.map((p) => ({ x: w - p.x - 6, y: p.y })) : pts;
 }
 
 export function formatTableLabel(table: string, tableWordPrefix: string): string {
@@ -105,7 +108,7 @@ export function seatIndexFor(seat: string | null | undefined, capacity: number):
 
 /** Canvas-space centre of seat `index` on a table, following the table's rotation. */
 export function seatCanvasPoint(o: FloorplanObject, index: number): { x: number; y: number } | null {
-  const p = seatPositions(o.type, o.w, o.h, o.capacity)[index];
+  const p = seatPositions(o.type, o.w, o.h, o.capacity, o.mirror)[index];
   if (!p) return null;
   const dx = p.x + 3 - o.w / 2, dy = p.y + 3 - o.h / 2;
   const rad = ((o.rot || 0) * Math.PI) / 180;

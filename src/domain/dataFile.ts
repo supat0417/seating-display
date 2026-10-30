@@ -46,6 +46,7 @@ export function loadSeatingData(raw: unknown): SeatingData {
       w: Number(r.w) || 100,
       h: Number(r.h) || 100,
       rot: Number(r.rot) || 0,
+      ...(r.mirror === true ? { mirror: true } : {}),
       label: r.label || '',
       capacity: Math.max(0, Number(r.capacity) || 0),
     };
