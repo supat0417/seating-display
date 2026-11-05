@@ -5,7 +5,6 @@ import { computeDisplayThemeTokens, resolveTheme, DISPLAY_THEME_VARS } from './d
 import { loadLang, saveLang, type Lang } from './domain/i18n';
 import { I18nProvider, useT } from './ui/i18n/I18nContext';
 import { ToastProvider } from './ui/components/Toast';
-import { SparkleLayer } from './ui/components/SparkleLayer';
 import { LangToggle } from './ui/components/LangToggle';
 import { Hero } from './ui/features/hero/Hero';
 import { SearchCard } from './ui/features/search/SearchCard';
@@ -28,8 +27,6 @@ function Screen({ data, lang, onLangChange }: { data: SeatingData; lang: Lang; o
 
   return (
     <>
-      <div className="bg-glow" />
-      <SparkleLayer />
       <LangToggle lang={lang} onChange={onLangChange} />
       <div id="wrap">
         <Hero logo={data.logo} />

@@ -214,9 +214,13 @@ export const PlanCard = forwardRef<PlanCardHandle, { floorplan: FloorplanObject[
           <div key={ringKey} className={`focus-ring${ringKey > 0 ? ' play' : ''}`} />
           <div className="hint-tag" style={{ opacity: hintVisible ? 1 : 0 }}>{t('hintTag')}</div>
           <div className="zoom-controls">
-            <button className="zbtn" title={t('zoomInTitle')} onClick={() => { onInteractionStart(); camera.zoomInBtn(); }}>+</button>
-            <button className="zbtn home" title={t('homeTitle')} onClick={resetView}>⤢</button>
-            <button className="zbtn" title={t('zoomOutTitle')} onClick={() => { onInteractionStart(); camera.zoomOutBtn(); }}>−</button>
+            <button className="zbtn" title={t('zoomInTitle')} aria-label={t('zoomInTitle')} onClick={() => { onInteractionStart(); camera.zoomInBtn(); }}>+</button>
+            <button className="zbtn home" title={t('homeTitle')} onClick={resetView} aria-label={t('homeTitle')}>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" />
+              </svg>
+            </button>
+            <button className="zbtn" title={t('zoomOutTitle')} aria-label={t('zoomOutTitle')} onClick={() => { onInteractionStart(); camera.zoomOutBtn(); }}>−</button>
           </div>
           <GuestPanel obj={panelObj} guests={guests} highlightName={highlightName} open={panelOpen}
             expanded={panelExpanded} onToggleExpanded={() => setPanelExpanded((v) => !v)} onClose={resetView} />

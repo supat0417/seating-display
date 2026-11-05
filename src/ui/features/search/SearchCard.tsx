@@ -44,10 +44,16 @@ export function SearchCard({
   return (
     <div className="search-card">
       <div className="search-wrap2">
-        <span className="sicon">🔍</span>
+        <span className="sicon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+            <circle cx="8.5" cy="8.5" r="5.75" /><path d="M13 13l4.5 4.5" />
+          </svg>
+        </span>
         <input
           ref={inputRef}
-          type="text"
+          type="search"
+          aria-label={t('searchPlaceholder')}
+          autoComplete="off"
           placeholder={t('searchPlaceholder')}
           value={query}
           onChange={(e) => { setQuery(e.target.value); setShowResults(true); }}
@@ -58,10 +64,10 @@ export function SearchCard({
         <div className="search-results2">
           {trimmed && matches.length === 0 && <div className="search-empty">{t('searchEmpty')}</div>}
           {matches.map((g, i) => (
-            <div key={i} className="result-row2" onClick={() => selectGuest(g)}>
+            <button type="button" key={i} className="result-row2" onClick={() => selectGuest(g)}>
               <span className="rname2">{g.name}</span>
-              <span className="rtable2">{formatTableLabel(g.table, t('tableWordPrefix'))} · {t('seatInline', g.seat)}</span>
-            </div>
+              <span className="rtable2"><b>{formatTableLabel(g.table, t('tableWordPrefix'))}</b>{t('seatInline', g.seat)}</span>
+            </button>
           ))}
         </div>
       )}

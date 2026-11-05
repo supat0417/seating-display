@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { FloorplanObject } from '../../../domain/floorplan';
+import { formatTableLabel, type FloorplanObject } from '../../../domain/floorplan';
 import { seatRosterForTable, type Guest } from '../../../domain/guest';
 import { useT } from '../../i18n/I18nContext';
 
@@ -44,8 +44,7 @@ export function GuestPanel({
       <div className={`guest-panel${open ? ' open' : ''}${expanded ? ' expanded' : ''}`}>
         <div className="gp-head">
           <button className="gp-close" aria-label={t('gpCloseLabel')} onClick={onClose}>&times;</button>
-          <div className="gp-eyebrow">Table</div>
-          <div className="gp-title">{obj?.label ?? '—'}</div>
+          <div className="gp-title">{obj ? formatTableLabel(obj.label, t('tableWordPrefix')) : ''}</div>
           <div className="gp-cap">{obj?.capacity ? t('capacityFraction', filled, obj.capacity) : t('seatsSuffix', filled)}</div>
         </div>
         {me && (
