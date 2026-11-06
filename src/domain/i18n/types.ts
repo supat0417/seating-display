@@ -26,6 +26,10 @@ export interface Dictionary {
   emptySeatLabel: string;
   noGuestForTable: string;
   searchEmpty: string;
+  /** Short "where in the room" phrase shown under each search result. */
+  location: (side: 'left' | 'center' | 'right', depth: 'front' | 'middle' | 'back') => string;
+  /** Tap affordance on a search result row. */
+  viewOnPlan: string;
   toastTableNotFound: (table: string) => string;
   langToggleTitle: string;
 }

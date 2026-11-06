@@ -136,3 +136,40 @@ export function computeContentBBox(floorplan: FloorplanObject[]): Rect {
   }
   return { minX, minY, maxX, maxY };
 }
+
+export type LocationSide = 'left' | 'center' | 'right';
+export type LocationDepth = 'front' | 'middle' | 'back';
+export interface TableLocation { side: LocationSide; depth: LocationDepth }
+
+/** Rough "where in the room" description of a table, using the stage as the front of the room
+ * and left/right as seen by someone facing the stage. Table centres are projected onto the
+ * room's front-back axis and split into thirds; the side comes from the offset from the
+ * stage's centre line. Returns null when there is no stage to orient by. */
+export function describeLocation(floorplan: FloorplanObject[], obj: FloorplanObject): TableLocation | null {
+  const stage = floorplan.find((o) => o.type === 'stage');
+  const tables = floorplan.filter((o) => o.type === 'round' || o.type === 'long');
+  if (!stage || tables.length === 0) return null;
+  const centre = (o: FloorplanObject) => ({ x: o.x + o.w / 2, y: o.y + o.h / 2 });
+  const s = centre(stage);
+  const pts = tables.map(centre);
+  const mid = { x: pts.reduce((a, p) => a + p.x, 0) / pts.length, y: pts.reduce((a, p) => a + p.y, 0) / pts.length };
+  // Unit vector pointing from the room towards the stage ("forward").
+  const len = Math.hypot(s.x - mid.x, s.y - mid.y) || 1;
+  const fx = (s.x - mid.x) / len, fy = (s.y - mid.y) / len;
+  // Right-hand side when facing forward (screen coords, y down).
+  const rx = -fy, ry = fx;
+
+  const depthOf = (p: { x: number; y: number }) => (s.x - p.x) * fx + (s.y - p.y) * fy;
+  const sideOf = (p: { x: number; y: number }) => (p.x - s.x) * rx + (p.y - s.y) * ry;
+  const depths = pts.map(depthOf);
+  const dMin = Math.min(...depths), dSpan = Math.max(...depths) - dMin;
+  const maxSide = Math.max(...pts.map((p) => Math.abs(sideOf(p))));
+
+  const p = centre(obj);
+  const t = dSpan > 0 ? (depthOf(p) - dMin) / dSpan : 0;
+  const lateral = maxSide > 0 ? sideOf(p) / maxSide : 0;
+  return {
+    side: lateral < -0.3 ? 'left' : lateral > 0.3 ? 'right' : 'center',
+    depth: t < 1 / 3 ? 'front' : t > 2 / 3 ? 'back' : 'middle',
+  };
+}

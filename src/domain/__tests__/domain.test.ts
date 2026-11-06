@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CANVAS_H, CANVAS_W, computeContentBBox, formatTableLabel, landmarkFor, seatCanvasPoint, seatIndexFor, seatPositions, type FloorplanObject } from '../floorplan';
+import { CANVAS_H, CANVAS_W, computeContentBBox, describeLocation, formatTableLabel, landmarkFor, seatCanvasPoint, seatIndexFor, seatPositions, type FloorplanObject } from '../floorplan';
 import { seatRosterForTable } from '../guest';
 import { THEMES, computeDisplayThemeTokens, resolveTheme } from '../theme';
 import { loadSeatingData, SeatingDataError } from '../dataFile';
@@ -144,5 +144,30 @@ describe('focus helpers', () => {
     const turned = seatCanvasPoint(obj('t', 'round', 0, 0, 90), 0)!;
     expect(turned.x).toBeCloseTo(50 + r, 5);
     expect(turned.y).toBeCloseTo(50, 5);
+  });
+});
+
+describe('describeLocation', () => {
+  const obj = (id: string, type: FloorplanObject['type'], x: number, y: number): FloorplanObject =>
+    ({ id, type, x, y, w: 100, h: 100, rot: 0, label: id, capacity: type === 'stage' ? 0 : 10 });
+  // Stage along the top; a 3x3 grid of tables below it.
+  const plan = [
+    obj('stage', 'stage', 450, 0),
+    ...[0, 1, 2].flatMap((row) => [0, 1, 2].map((col) => obj(`t${row}${col}`, 'round', 100 + col * 350, 200 + row * 250))),
+  ];
+  const at = (id: string) => describeLocation(plan, plan.find((o) => o.id === id)!);
+
+  it('uses the stage as the front and the viewer facing it for left/right', () => {
+    expect(at('t00')).toEqual({ side: 'left', depth: 'front' });
+    expect(at('t11')).toEqual({ side: 'center', depth: 'middle' });
+    expect(at('t22')).toEqual({ side: 'right', depth: 'back' });
+  });
+  it('flips left/right when the stage is at the bottom', () => {
+    const flipped = plan.map((o) => (o.type === 'stage' ? { ...o, y: 1000 } : o));
+    expect(describeLocation(flipped, flipped.find((o) => o.id === 't00')!)).toEqual({ side: 'right', depth: 'back' });
+  });
+  it('returns null without a stage', () => {
+    const noStage = plan.filter((o) => o.type !== 'stage');
+    expect(describeLocation(noStage, noStage[0])).toBeNull();
   });
 });

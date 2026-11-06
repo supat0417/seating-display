@@ -26,6 +26,12 @@ const en: Dictionary = {
   emptySeatLabel: 'Empty',
   noGuestForTable: 'No one is seated at this table yet.',
   searchEmpty: 'No guest with that name. Check the spelling, or try just your first name.',
+  location: (side, depth) => {
+    const d = { front: 'front, near the stage', middle: 'middle of the room', back: 'back of the room' }[depth];
+    const s = { left: 'Left side', center: 'Centre', right: 'Right side' }[side];
+    return side === 'center' && depth === 'middle' ? 'Middle of the room' : `${s} · ${d}`;
+  },
+  viewOnPlan: 'View plan',
   toastTableNotFound: (table) => `Table "${table}" isn't on the floor plan. Please ask a member of staff.`,
   langToggleTitle: 'Switch language / เปลี่ยนภาษา',
 };
